@@ -1,0 +1,5 @@
+<%= if get_user(@conn) do %>
+  View your <a href="/dashboard">dashboard</a>
+<% else %>
+  Please <a href="/login">login</a> to view your shopping list
+<% end %>
