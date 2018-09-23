@@ -4,10 +4,10 @@ defmodule ShoppingList.Recipes do
   """
   import Ecto.Query, warn: false
   alias ShoppingList.Repo
-  alias ShoppingList.Recipes.Recipe
+  alias ShoppingList.Recipes.{Recipe, Ingredient}
 
   @doc """
-  Returns the list of recipe for the user.
+  Returns the list of recipe for the recipe.
 
   ## Examples
 
@@ -22,7 +22,18 @@ defmodule ShoppingList.Recipes do
   end
 
   @doc """
-  Gets a single user.
+  Returns a list of all available ingredients
+
+  ## Examples
+      iex> list_available_ingredients()
+      [%Ingredient{}, ...]
+  """
+  def list_available_ingredients do
+    Repo.all(Ingredient)
+  end
+
+  @doc """
+  Gets a single recipe.
 
   Raises `Ecto.NoResultsError` if the User does not exist.
 
@@ -35,10 +46,14 @@ defmodule ShoppingList.Recipes do
       ** (Ecto.NoResultsError)
 
   """
-  def get_recipe!(id), do: Repo.get!(Recipe, id)
+  def get_recipe!(id) do
+    Recipe
+    |> Repo.get!(id)
+    |> Repo.preload([:ingredients])
+  end
 
   @doc """
-  Creates a user.
+  Creates a recipe.
 
   ## Examples
 
@@ -49,15 +64,29 @@ defmodule ShoppingList.Recipes do
       {:error, %Ecto.Changeset{}}
 
   """
-  def create_recipe(attrs \\ %{}) do
+  def create_recipe(attrs \\ %{})
+
+  def create_recipe(%{"ingredients" => ids} = attrs) do
+    ingredients =
+      Ingredient
+      |> where([i], i.id in ^ids)
+      |> Repo.all()
+
+    updated_attrs = Map.merge(attrs, %{"ingredients" => ingredients})
+
+    %Recipe{}
+    |> Recipe.changeset(updated_attrs)
+    |> Repo.insert()
+  end
+
+  def create_recipe(attrs) do
     %Recipe{}
     |> Recipe.changeset(attrs)
-    |> IO.inspect(label: "changeset")
     |> Repo.insert()
   end
 
   @doc """
-  Updates a user.
+  Updates a recipe.
 
   ## Examples
 
@@ -68,10 +97,18 @@ defmodule ShoppingList.Recipes do
       {:error, %Ecto.Changeset{}}
 
   """
-  def update_recipe(%Recipe{} = recipe, attrs) do
+  def update_recipe(%Recipe{} = recipe, %{"ingredients" => ids} = attrs) do
+    ingredients =
+      Ingredient
+      |> where([i], i.id in ^ids)
+      |> Repo.all()
+
+    updated_attrs = Map.merge(attrs, %{"ingredients" => ingredients})
+
     recipe
-    |> recipe.changeset(attrs)
+    |> Recipe.changeset(updated_attrs)
     |> Repo.update()
+    |> IO.inspect()
   end
 
   @doc """

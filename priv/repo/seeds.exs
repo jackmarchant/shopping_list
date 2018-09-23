@@ -1,11 +1,6 @@
-# Script for populating the database. You can run it as:
-#
-#     mix run priv/repo/seeds.exs
-#
-# Inside the script, you can read and write to any of your
-# repositories directly:
-#
-#     ShoppingList.Repo.insert!(%ShoppingList.SomeSchema{})
-#
-# We recommend using the bang functions (`insert!`, `update!`
-# and so on) as they will fail if something goes wrong.
+alias ShoppingList.Repo
+alias ShoppingList.Recipes.Ingredient
+
+Repo.insert!(%Ingredient{name: "Butter"})
+Repo.insert!(%Ingredient{name: "Garlic"})
+Repo.insert!(%Ingredient{name: "Chicken Breast"})

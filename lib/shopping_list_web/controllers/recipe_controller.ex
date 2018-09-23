@@ -13,7 +13,8 @@ defmodule ShoppingListWeb.RecipeController do
   @spec new(Plug.Conn.t(), any()) :: Plug.Conn.t()
   def new(conn, _params) do
     changeset = Recipes.change_recipe(%Recipe{})
-    render(conn, "new.html", changeset: changeset)
+    ingredients = list_available_ingredients()
+    render(conn, "new.html", changeset: changeset, available_ingredients: ingredients)
   end
 
   def create(%{assigns: %{current_user: user}} = conn, %{"recipe" => recipe_params}) do
@@ -24,10 +25,15 @@ defmodule ShoppingListWeb.RecipeController do
       {:ok, _recipe} ->
         conn
         |> put_flash(:info, "Recipe created successfully.")
-        |> redirect(to: "/recipe")
+        |> redirect(to: recipe_path(conn, :index))
 
       {:error, %Ecto.Changeset{} = changeset} ->
-        render(conn, "new.html", changeset: changeset)
+        render(
+          conn,
+          "new.html",
+          changeset: changeset,
+          available_ingredients: list_available_ingredients()
+        )
     end
   end
 
@@ -39,17 +45,25 @@ defmodule ShoppingListWeb.RecipeController do
   def edit(conn, %{"id" => id}) do
     recipe = Recipes.get_recipe!(id)
     changeset = Recipes.change_recipe(recipe)
-    render(conn, "edit.html", recipe: recipe, changeset: changeset)
+    ingredients = list_available_ingredients()
+
+    render(
+      conn,
+      "edit.html",
+      recipe: recipe,
+      changeset: changeset,
+      available_ingredients: ingredients
+    )
   end
 
   def update(conn, %{"id" => id, "recipe" => recipe_params}) do
     recipe = Recipes.get_recipe!(id)
-    # recipe_path(conn, :show, recipe)
+
     case Recipes.update_recipe(recipe, recipe_params) do
       {:ok, _recipe} ->
         conn
         |> put_flash(:info, "recipe updated successfully.")
-        |> redirect(to: "/recipe")
+        |> redirect(to: recipe_path(conn, :show, recipe))
 
       {:error, %Ecto.Changeset{} = changeset} ->
         render(conn, "edit.html", recipe: recipe, changeset: changeset)
@@ -62,6 +76,14 @@ defmodule ShoppingListWeb.RecipeController do
 
     conn
     |> put_flash(:info, "recipe deleted successfully.")
-    |> redirect(to: "/recipe")
+    |> redirect(to: recipe_path(conn, :index))
+  end
+
+  defp list_available_ingredients do
+    ingredients = Recipes.list_available_ingredients()
+
+    Enum.reduce(ingredients, [], fn i, acc ->
+      Keyword.put(acc, String.to_atom(i.name), i.id)
+    end)
   end
 end

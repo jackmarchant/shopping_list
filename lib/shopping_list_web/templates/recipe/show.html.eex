@@ -1,10 +1,14 @@
-<h2>Show Recipe</h2>
+<h2><%= @recipe.name %></h2>
 
 <ul>
-
   <li>
-    <strong>Name:</strong>
-    <%= @recipe.name %>
+    <strong>Ingredients:</strong>
+    <ul>
+        <%= for ingredient <- @recipe.ingredients do %>
+          <li><%= ingredient.name %></li>
+        <% end %>
+    </ul>
+    <br />
   </li>
 
   <li>

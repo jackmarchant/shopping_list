@@ -12,6 +12,12 @@
   </div>
 
   <div class="form-group">
+    <%= label f, :ingredients, class: "control-label" %>
+    <%= multiple_select f, :ingredients, @available_ingredients, class: "form-control", selected: [] %>
+    <%= error_tag f, :ingredients %>
+  </div>
+
+  <div class="form-group">
     <%= label f, :steps, class: "control-label" %>
     <%= textarea f, :steps, class: "form-control" %>
     <%= error_tag f, :steps %>
