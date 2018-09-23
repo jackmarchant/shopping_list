@@ -25,18 +25,15 @@ defmodule ShoppingListWeb.Router do
     # user session
     get "/login", SessionController, :new
     post "/login", SessionController, :create
-    delete "/logout", SessionController, :destroy
-
-
+    delete("/logout", SessionController, :destroy)
   end
 
   scope "/", ShoppingListWeb do
     pipe_through [:browser, :authenticated]
 
-    # dashboard
     get "/dashboard", DashboardController, :index
 
-    # user
-    resources "/user", UserController
+    resources("/user", UserController)
+    resources("/recipe", RecipeController)
   end
 end

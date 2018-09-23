@@ -16,6 +16,7 @@
       <header>
         <%= if get_user(@conn) do %>
           <a href="/user">Users</a>
+          <a href="/recipe">My Recipes</a>
           <%= render ShoppingListWeb.SessionView, "signout.html", assigns %>
         <% end %>
       </header>
